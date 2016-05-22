@@ -31,7 +31,8 @@ class LinearClassifier:
         if self.W is None:
             self.W = np.random.randn(num_classes, dim) * 0.001
 
-        loss_history = []
+        loss_history = [2.0]
+        min_loss = 2.0
         for it in xrange(num_iters):
             batch_indexes = np.random.choice(num_train, batch_size)
             X_batch = X[:, batch_indexes]
@@ -39,10 +40,12 @@ class LinearClassifier:
 
             loss, dW = self.loss(X_batch, y_batch, self.W)
             loss_history.append(loss)
-            self.W -= dW * learning_rate
+            if loss > 0 and loss < min_loss:
+                self.W -= dW * learning_rate
+                min_loss = loss
           
             if verbose and it % 100 == 0:
-                print('iteration %d / %d: loss %f' % (it, num_iters, loss))
+                print('iteration %d / %d: loss %f' % (it, num_iters, np.min(loss_history[loss_history > 0])))
         return loss_history
 
     def predict(self, X):
@@ -58,7 +61,7 @@ class LinearClassifier:
           array of length N, and each element is an integer giving the predicted
           class.
         """
-        scores = self.W * X
+        scores = self.W.dot(X)
         y_pred = np.argmax(scores, axis=0)
         return y_pred
 
@@ -87,8 +90,8 @@ class LinearSVM(LinearClassifier):
     """ A subclass that uses the Multiclass SVM loss function """
 
     def loss(self, X_batch, y_batch, reg):
-        #    return svm_loss_vectorized(self.W, X_batch, y_batch, reg)
-        return svm_loss_naive(self.W, X_batch, y_batch, reg)
+        return svm_loss_vectorized(self.W, X_batch, y_batch, reg)
+        #return svm_loss_naive(self.W, X_batch, y_batch, reg)
 
 
 class Softmax(LinearClassifier):

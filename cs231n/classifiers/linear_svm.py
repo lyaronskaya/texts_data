@@ -53,7 +53,7 @@ def svm_loss_vectorized(W, X, y, reg):
     margins[y, np.arange(N)] = -np.sum(margins, axis=0)
     dW = margins.dot(X.T) / N
 
-    return float(loss), dW
+    return np.mean(loss), dW
 
 
 

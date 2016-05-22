@@ -54,7 +54,5 @@ def softmax_loss_vectorized(W, X, y, reg):
     dW /= N
     loss /= N
     dW += reg * W
-    loss += reg * np.sum(W * W)
-    loss = np.mean(loss) #почему-то уже в класификаторе эта штука выдавала array, поэтому возвращаю среднее
-    loss = loss[0]
-    return loss, dW
+    loss += reg * np.sum(W ** 2)
+    return np.mean(loss), dW  #bug
